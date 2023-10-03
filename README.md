@@ -1,1 +1,1 @@
-# Capstone2024
+# EULA Capstone Project 2024 
