@@ -21,29 +21,29 @@ app.use(cors());
 app.post( "/api/chat", ( req, res ) => {
 
   (async () => {
-
+    
     const { question, history } = req.body;
-
+  
     winston.log({
       level: 'info',
       message: `${ question }`
     });
-
+  
     // only accept post requests
     if (req.method !== 'POST') {
       res.status(405).json({ error: 'Method not allowed' });
       return;
     }
-
+  
     if (!question) {
       return res.status(400).json({ message: 'No question in the request' });
     }
     // OpenAI recommends replacing newlines with spaces for best results
     const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
-
+  
     try {
       const index = await pinecone.Index(PINECONE_INDEX_NAME);
-
+  
       /* create vectorstore*/
       const vectorStore = await PineconeStore.fromExistingIndex(
         new OpenAIEmbeddings({}),
@@ -53,7 +53,7 @@ app.post( "/api/chat", ( req, res ) => {
           // namespace: PINECONE_NAME_SPACE, //namespace comes from your config folder
         },
       );
-
+  
       // create chain
       const chain = makeChain(vectorStore);
       // Ask a question using chat history
@@ -61,7 +61,7 @@ app.post( "/api/chat", ( req, res ) => {
         question: sanitizedQuestion,
         chat_history: history || [],
       });
-
+  
       console.log('response', response);
       res.status(200).json(response);
     } catch (error: any) {
